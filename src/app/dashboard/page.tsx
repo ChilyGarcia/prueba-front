@@ -16,6 +16,7 @@ export default function AdminPanel() {
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isToastOpen, setIsToastOpen] = useState(false);
+  const [isToastDeleteOpen, setIsToastDeleteOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
@@ -42,7 +43,7 @@ export default function AdminPanel() {
       return [];
     }
   };
-  
+
   const fetchLogOut = async () => {
     try {
       const response = await authenticationService.logOut();
@@ -170,6 +171,12 @@ export default function AdminPanel() {
         }, 2000);
         return;
       }
+
+      setIsToastDeleteOpen(true);
+
+      setTimeout(() => {
+        setIsToastDeleteOpen(false);
+      }, 2000);
 
       setUsers(users.filter((u) => u.id !== id));
     } catch (error) {
@@ -348,67 +355,94 @@ export default function AdminPanel() {
                       ? "Agregar nuevo usuario"
                       : "Editar usuario"}
                   </h3>
+
                   <form onSubmit={saveUser} className="space-y-4">
-                    <input
-                      className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                      type="text"
-                      placeholder="Nombres"
-                      value={currentUser?.first_name || ""}
-                      onChange={(e) =>
-                        setCurrentUser({
-                          ...currentUser!,
-                          first_name: e.target.value,
-                        })
-                      }
-                    />
-                    <input
-                      className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                      type="text"
-                      placeholder="Apellidos"
-                      value={currentUser?.last_name || ""}
-                      onChange={(e) =>
-                        setCurrentUser({
-                          ...currentUser!,
-                          last_name: e.target.value,
-                        })
-                      }
-                    />
-                    <input
-                      className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                      type="tel"
-                      placeholder="Número de teléfono"
-                      value={currentUser?.phone_number || ""}
-                      onChange={(e) =>
-                        setCurrentUser({
-                          ...currentUser!,
-                          phone_number: e.target.value,
-                        })
-                      }
-                    />
-                    <input
-                      className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                      type="email"
-                      placeholder="Correo electrónico"
-                      value={currentUser?.email || ""}
-                      onChange={(e) =>
-                        setCurrentUser({
-                          ...currentUser!,
-                          email: e.target.value,
-                        })
-                      }
-                    />
-                    <input
-                      className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                      type="password"
-                      placeholder="Contraseña"
-                      value={currentUser?.password || ""}
-                      onChange={(e) =>
-                        setCurrentUser({
-                          ...currentUser!,
-                          password: e.target.value,
-                        })
-                      }
-                    />
+                    <div className="space-y-1">
+                      <label htmlFor="first_name">Nombres</label>
+                      <input
+                        id="first_name"
+                        className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        type="text"
+                        placeholder="Nombres"
+                        value={currentUser?.first_name || ""}
+                        onChange={(e) =>
+                          setCurrentUser({
+                            ...currentUser!,
+                            first_name: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label htmlFor="last_name">Apellidos</label>
+                      <input
+                        id="last_name"
+                        className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        type="text"
+                        placeholder="Apellidos"
+                        value={currentUser?.last_name || ""}
+                        onChange={(e) =>
+                          setCurrentUser({
+                            ...currentUser!,
+                            last_name: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label htmlFor="phone_number">Número de teléfono</label>
+                      <input
+                        id="phone_number"
+                        className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        type="tel"
+                        placeholder="Número de teléfono"
+                        value={currentUser?.phone_number || ""}
+                        onChange={(e) =>
+                          setCurrentUser({
+                            ...currentUser!,
+                            phone_number: e.target.value,
+                          })
+                        }
+                      />{" "}
+                    </div>
+
+                    {mode === "create" && (
+                      <>
+                        <div className="space-y-1">
+                          <label htmlFor="email">Correo electrónico</label>
+                          <input
+                            className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                            type="email"
+                            placeholder="Correo electrónico"
+                            value={currentUser?.email || ""}
+                            onChange={(e) =>
+                              setCurrentUser({
+                                ...currentUser!,
+                                email: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+
+                        <div className="space-y-1">
+                          <label htmlFor="password">Contraseña</label>
+                          <input
+                            className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                            type="password"
+                            placeholder="Contraseña"
+                            value={currentUser?.password || ""}
+                            onChange={(e) =>
+                              setCurrentUser({
+                                ...currentUser!,
+                                password: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                      </>
+                    )}
+
                     <button
                       type="submit"
                       className="w-full px-4 py-2 bg-teal-600 text-white font-medium rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition duration-150 ease-in-out"
@@ -434,6 +468,16 @@ export default function AdminPanel() {
           <div className="toast toast-end">
             <div className="alert alert-error">
               <span className="text-white"> {error} </span>
+            </div>
+          </div>
+        </>
+      )}
+
+      {isToastDeleteOpen && (
+        <>
+          <div className="toast toast-end">
+            <div className="alert alert-success">
+              <span className="text-white"> User deleted succesfully </span>
             </div>
           </div>
         </>
