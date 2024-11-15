@@ -1,7 +1,7 @@
 import { IUser } from "@/interfaces/user.interface";
 import Cookies from "js-cookie";
 
-const BACKEND_URL = "http://127.0.0.1:8080/api";
+const BACKEND_URL = "https://plankton-app-dlawl.ondigitalocean.app/prueba-back2/api";
 
 const getToken = (): string | null => {
   const token = Cookies.get("token");
