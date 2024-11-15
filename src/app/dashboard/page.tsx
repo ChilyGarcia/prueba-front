@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { User, ChevronDown, Edit, Trash, Plus, X } from "lucide-react";
 import { authenticationService } from "@/services/authentication.service";
 import { IUser } from "@/interfaces/user.interface";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 interface User {
   id: number;
@@ -21,6 +23,7 @@ export default function AdminPanel() {
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState<IUser>();
+  const router = useRouter();
 
   const fetchUserDetails = async () => {
     try {
@@ -28,6 +31,15 @@ export default function AdminPanel() {
       return response;
     } catch (error) {
       console.error("Error fetching user details:", (error as Error).message);
+      return false;
+    }
+  };
+  const fetchLogOut = async () => {
+    try {
+      const response = await authenticationService.logOut();
+      return response;
+    } catch (error) {
+      console.error("Error logging out:", (error as Error).message);
       return false;
     }
   };
@@ -99,7 +111,15 @@ export default function AdminPanel() {
     setUsers(users.filter((u) => u.id !== id));
   };
 
-  const handleLogOut = () => {
+  const handleLogOut = async () => {
+    const logOut = await fetchLogOut();
+
+    if (logOut) {
+      Cookies.remove("token");
+      console.log(logOut);
+      router.push("/login");
+    }
+
     console.log("Se cerró la sesión");
   };
 
