@@ -7,6 +7,7 @@ import { backendService } from "@/services/backend.service";
 import { IUser } from "@/interfaces/user.interface";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { Oval } from "react-loader-spinner";
 
 export default function AdminPanel() {
   const [users, setUsers] = useState<IUser[]>([]);
@@ -18,6 +19,7 @@ export default function AdminPanel() {
   const [isToastOpen, setIsToastOpen] = useState(false);
   const [isToastDeleteOpen, setIsToastDeleteOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
@@ -35,7 +37,7 @@ export default function AdminPanel() {
     try {
       const response = await backendService.getAllUsers();
       if (response.length > 0 && Array.isArray(response[0])) {
-        return response[0]; // Aplanar el array anidado
+        return response[0];
       }
       return [];
     } catch (error) {
@@ -55,6 +57,7 @@ export default function AdminPanel() {
   };
 
   const fetchPostUser = async (body: IUser) => {
+    setIsLoading(true);
     try {
       const response = await backendService.postUser(body);
       if (response && Array.isArray(response)) {
@@ -63,15 +66,20 @@ export default function AdminPanel() {
       return undefined;
     } catch (error) {
       console.error("Error creating user:", (error as Error).message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const fetchUpdateUser = async (body: IUser) => {
+    setIsLoading(true);
     try {
       const response = await backendService.updateUser(body);
       return response;
     } catch (error) {
       console.error("Error updating user:", (error as Error).message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -205,6 +213,10 @@ export default function AdminPanel() {
 
     console.log("Se cerró la sesión");
   };
+
+  useEffect(() => {
+    console.log(isLoading);
+  }, [isLoading]);
 
   return (
     <>
@@ -467,7 +479,8 @@ export default function AdminPanel() {
                           (!currentUser ||
                             !currentUser.first_name ||
                             !currentUser.last_name ||
-                            !currentUser.phone_number))
+                            !currentUser.phone_number)) ||
+                        isLoading
                           ? "bg-[#04785784] text-white cursor-not-allowed"
                           : "bg-[#047857] text-white hover:bg-[#065f46] focus:ring-[#047857]"
                       }`}
@@ -483,10 +496,32 @@ export default function AdminPanel() {
                           (!currentUser ||
                             !currentUser.first_name ||
                             !currentUser.last_name ||
-                            !currentUser.phone_number))
+                            !currentUser.phone_number)) ||
+                        isLoading
                       }
                     >
-                      {mode === "create" ? "Agregar" : "Actualizar"}
+                      {isLoading ? (
+                        <>
+                          <Oval
+                            height={20}
+                            width={20}
+                            color="#ffffff"
+                            wrapperStyle={{
+                              display: "inline-block",
+                              verticalAlign: "middle",
+                            }}
+                            visible={true}
+                            ariaLabel="oval-loading"
+                            secondaryColor="#ffffff"
+                            strokeWidth={2}
+                            strokeWidthSecondary={2}
+                          />
+                        </>
+                      ) : mode === "create" ? (
+                        "Agregar"
+                      ) : (
+                        "Actualizar"
+                      )}
                     </button>
                   </form>
                 </div>
