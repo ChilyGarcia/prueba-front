@@ -380,7 +380,9 @@ export default function AdminPanel() {
 
                   <form onSubmit={saveUser} className="space-y-4">
                     <div className="space-y-1">
-                      <label htmlFor="first_name">Nombres</label>
+                      <label htmlFor="first_name" className="text-black">
+                        Nombres
+                      </label>
                       <input
                         id="first_name"
                         className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -396,7 +398,9 @@ export default function AdminPanel() {
                       />
                     </div>
                     <div className="space-y-1">
-                      <label htmlFor="last_name">Apellidos</label>
+                      <label htmlFor="last_name" className="text-black">
+                        Apellidos
+                      </label>
                       <input
                         id="last_name"
                         className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -413,7 +417,9 @@ export default function AdminPanel() {
                     </div>
 
                     <div className="space-y-1">
-                      <label htmlFor="phone_number">Número de teléfono</label>
+                      <label htmlFor="phone_number" className="text-black">
+                        Número de teléfono
+                      </label>
                       <input
                         id="phone_number"
                         className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -432,7 +438,9 @@ export default function AdminPanel() {
                     {mode === "create" && (
                       <>
                         <div className="space-y-1">
-                          <label htmlFor="email">Correo electrónico</label>
+                          <label htmlFor="email" className="text-black">
+                            Correo electrónico
+                          </label>
                           <input
                             className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                             type="email"
@@ -448,7 +456,9 @@ export default function AdminPanel() {
                         </div>
 
                         <div className="space-y-1">
-                          <label htmlFor="password">Contraseña</label>
+                          <label htmlFor="password" className="text-black">
+                            Contraseña
+                          </label>
                           <input
                             className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                             type="password"

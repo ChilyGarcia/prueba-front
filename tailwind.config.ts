@@ -14,5 +14,11 @@ export default {
       },
     },
   },
-  plugins: [ require('daisyui')],
+  plugins: [require("daisyui")],
+  daisyui: {
+    themes: [
+      "light", // Usa solo el tema claro
+    ],
+    base: false, // Evita la detección automática del sistema
+  },
 } satisfies Config;
