@@ -52,7 +52,10 @@ export default function AdminPanel() {
   const fetchPostUser = async (body: IUser) => {
     try {
       const response = await backendService.postUser(body);
-      return response;
+      if (response && Array.isArray(response)) {
+        return response[0];
+      }
+      return undefined;
     } catch (error) {
       console.error("Error creating user:", (error as Error).message);
     }
@@ -93,7 +96,7 @@ export default function AdminPanel() {
       const allUsers = await fetchAllUsers();
       if (allUsers) {
         console.log("All users:", allUsers);
-        setUsers(allUsers.users);
+        setUsers(allUsers);
       }
     };
 
