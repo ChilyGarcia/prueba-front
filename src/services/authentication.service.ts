@@ -2,7 +2,7 @@ import { ILoginCredentials } from "@/interfaces/login.interface";
 
 import Cookies from "js-cookie";
 
-const BACKEND_URL = "http://127.0.0.1:8000/api/auth";
+const BACKEND_URL = "http://127.0.0.1:8080/api/auth";
 
 const fetchWithInterceptor = async (
   url: string,

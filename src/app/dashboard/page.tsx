@@ -56,6 +56,15 @@ export default function AdminPanel() {
     }
   };
 
+  const fetchUpdateUser = async (body: IUser) => {
+    try {
+      const response = await backendService.updateUser(body);
+      return response;
+    } catch (error) {
+      console.error("Error updating user:", (error as Error).message);
+    }
+  };
+
   useEffect(() => {
     const getUserDetails = async () => {
       const userDetails = await fetchUserDetails();
@@ -111,10 +120,16 @@ export default function AdminPanel() {
         if (newUser) {
           setUsers([...users, { ...newUser.user, id: users.length + 1 }]);
         }
-
-        // setUsers([...users, { ...currentUser, id: users.length + 1 }]);
       } else {
-        setUsers(users.map((u) => (u.id === currentUser.id ? currentUser : u)));
+        console.log("Editando nuevo usuario", currentUser);
+
+        const editUser = await fetchUpdateUser(currentUser);
+
+        if (editUser) {
+          setUsers(
+            users.map((u) => (u.id === currentUser.id ? currentUser : u))
+          );
+        }
       }
     }
     closeModal();

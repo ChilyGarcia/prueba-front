@@ -1,7 +1,7 @@
 import { IUser } from "@/interfaces/user.interface";
 import Cookies from "js-cookie";
 
-const BACKEND_URL = "http://127.0.0.1:8000/api";
+const BACKEND_URL = "http://127.0.0.1:8080/api";
 
 export const backendService = {
   getAllUsers: async () => {
@@ -42,6 +42,28 @@ export const backendService = {
       return data;
     } catch (error) {
       console.error("Error creating user:", (error as Error).message);
+    }
+  },
+
+  updateUser: async (body: IUser) => {
+    const token = Cookies.get("token");
+
+    try {
+      const response = await fetch(BACKEND_URL + "/users/" + body.id, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error updating user:", (error as Error).message);
     }
   },
 
