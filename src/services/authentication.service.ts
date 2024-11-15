@@ -46,7 +46,7 @@ export const authenticationService = {
       Cookies.set("token", data.token);
       return data;
     } catch (error) {
-      console.error("Error logging in:", (error as Error).message);
+      console.log("Error logging in:", (error as Error).message);
       return false;
     }
   },
