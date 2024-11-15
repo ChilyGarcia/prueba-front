@@ -1,4 +1,4 @@
-# Proyecto Next.js
+# Frontend prueba UNBC
 
 ## Requisitos Previos
 
