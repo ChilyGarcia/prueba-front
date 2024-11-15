@@ -3,26 +3,19 @@
 import { useState, useEffect } from "react";
 import { User, ChevronDown, Edit, Trash, Plus, X } from "lucide-react";
 import { authenticationService } from "@/services/authentication.service";
+import { backendService } from "@/services/backend.service";
 import { IUser } from "@/interfaces/user.interface";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 
-interface User {
-  id: number;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  email: string;
-  password: string;
-}
-
 export default function AdminPanel() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [users, setUsers] = useState<IUser[]>([]);
+  const [user, setUser] = useState<IUser>();
+  const [currentUser, setCurrentUser] = useState<IUser | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [mode, setMode] = useState<"create" | "edit">("create");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState<IUser>();
+
   const router = useRouter();
 
   const fetchUserDetails = async () => {
@@ -32,6 +25,16 @@ export default function AdminPanel() {
     } catch (error) {
       console.error("Error fetching user details:", (error as Error).message);
       return false;
+    }
+  };
+
+  const fetchAllUsers = async () => {
+    try {
+      const response = await backendService.getAllUsers();
+      return response;
+    } catch (error) {
+      console.error("Error fetching users:", (error as Error).message);
+      return [];
     }
   };
   const fetchLogOut = async () => {
@@ -53,36 +56,27 @@ export default function AdminPanel() {
       }
     };
 
-    setUsers([
-      {
-        id: 1,
-        firstName: "John",
-        lastName: "Doe",
-        phone: "123456789",
-        email: "john@example.com",
-        password: "********",
-      },
-      {
-        id: 2,
-        firstName: "Jane",
-        lastName: "Smith",
-        phone: "987654321",
-        email: "jane@example.com",
-        password: "********",
-      },
-    ]);
+    const getAllUsers = async () => {
+      const allUsers = await fetchAllUsers();
+      if (allUsers) {
+        console.log("All users:", allUsers);
+        setUsers(allUsers.users);
+      }
+    };
+
+    getAllUsers();
 
     getUserDetails();
   }, []);
 
-  const openModal = (mode: "create" | "edit", user?: User) => {
+  const openModal = (mode: "create" | "edit", user?: IUser) => {
     setMode(mode);
     setCurrentUser(
       user || {
         id: 0,
-        firstName: "",
-        lastName: "",
-        phone: "",
+        first_name: "",
+        last_name: "",
+        phone_number: "",
         email: "",
         password: "",
       }
@@ -237,13 +231,13 @@ export default function AdminPanel() {
                     className="hover:bg-gray-50 transition duration-150 ease-in-out"
                   >
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {user.firstName}
+                      {user.first_name}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {user.lastName}
+                      {user.last_name}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {user.phone}
+                      {user.phone_number}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {user.email}
@@ -284,11 +278,11 @@ export default function AdminPanel() {
                     className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                     type="text"
                     placeholder="First Name"
-                    value={currentUser?.firstName || ""}
+                    value={currentUser?.first_name || ""}
                     onChange={(e) =>
                       setCurrentUser({
                         ...currentUser!,
-                        firstName: e.target.value,
+                        first_name: e.target.value,
                       })
                     }
                   />
@@ -296,21 +290,24 @@ export default function AdminPanel() {
                     className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                     type="text"
                     placeholder="Last Name"
-                    value={currentUser?.lastName || ""}
+                    value={currentUser?.last_name || ""}
                     onChange={(e) =>
                       setCurrentUser({
                         ...currentUser!,
-                        lastName: e.target.value,
+                        last_name: e.target.value,
                       })
                     }
                   />
                   <input
                     className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                     type="tel"
-                    placeholder="Phone"
-                    value={currentUser?.phone || ""}
+                    placeholder="phone_number"
+                    value={currentUser?.phone_number || ""}
                     onChange={(e) =>
-                      setCurrentUser({ ...currentUser!, phone: e.target.value })
+                      setCurrentUser({
+                        ...currentUser!,
+                        phone_number: e.target.value,
+                      })
                     }
                   />
                   <input
