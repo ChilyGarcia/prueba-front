@@ -3,198 +3,92 @@ import Cookies from "js-cookie";
 
 const BACKEND_URL = "http://127.0.0.1:8080/api";
 
+const getToken = (): string | null => {
+  const token = Cookies.get("token");
+  if (!token) {
+    Cookies.remove("token");
+    window.location.href = "/";
+    return null;
+  }
+  return token;
+};
+
+const handleFetchError = async (response: Response) => {
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(
+      errorData.message || `HTTP error! status: ${response.status}`
+    );
+  }
+};
+
+const fetchWithAuth = async (
+  url: string,
+  options: RequestInit
+): Promise<any> => {
+  const token = getToken();
+  if (!token) return [];
+
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      ...options.headers,
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  await handleFetchError(response);
+  return response.json();
+};
+
 export const backendService = {
   deleteUser: async (id: number): Promise<any> => {
-    const token = Cookies.get("token");
-
-    if (!token) {
-      console.error("No token found");
-      return [];
-    }
-
     try {
-      const response = await fetch(`${BACKEND_URL}/users/${id}`, {
+      return await fetchWithAuth(`${BACKEND_URL}/users/${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data;
     } catch (error) {
-      console.error("Error deleting user:", (error as Error).message);
-      return [];
+      console.log("Error deleting user:", (error as Error).message);
+      throw error;
     }
   },
 
-  getAllUsers: async () => {
-    const token = Cookies.get("token");
+  getAllUsers: async (): Promise<IUser[]> => {
     try {
-      const response = await fetch(BACKEND_URL + "/users", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      return data;
+      return await fetchWithAuth(`${BACKEND_URL}/users`, {});
     } catch (error) {
       console.error("Error fetching users:", (error as Error).message);
-      return [];
+      throw error;
     }
   },
 
-  postUser: async (body: IUser) => {
-    const token = Cookies.get("token");
-
+  postUser: async (body: IUser): Promise<IUser | undefined> => {
     try {
-      const response = await fetch(BACKEND_URL + "/users", {
+      return await fetchWithAuth(`${BACKEND_URL}/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(body),
       });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      return data;
     } catch (error) {
       console.error("Error creating user:", (error as Error).message);
+      throw error;
     }
   },
 
-  updateUser: async (body: IUser) => {
-    const token = Cookies.get("token");
-
+  updateUser: async (body: IUser): Promise<IUser | undefined> => {
     try {
-      const response = await fetch(BACKEND_URL + "/users/" + body.id, {
+      return await fetchWithAuth(`${BACKEND_URL}/users/${body.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(body),
       });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      return data;
     } catch (error) {
       console.error("Error updating user:", (error as Error).message);
-    }
-  },
-
-  professionalList: async () => {
-    try {
-      const response = await fetch(BACKEND_URL + "/specialties");
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error(
-        "Error fetching professional list:",
-        (error as Error).message
-      );
-      return [];
-    }
-  },
-
-  filteredProfessionals: async (body: any) => {
-    try {
-      const response = await fetch(BACKEND_URL + "/find-availaibility-filter", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error(
-        "Error fetching filtered professionals:",
-        (error as Error).message
-      );
-      return [];
-    }
-  },
-  appointment: async (body: any) => {
-    const token = Cookies.get("token");
-    try {
-      const response = await fetch(BACKEND_URL + "/appointments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error creating appointment:", (error as Error).message);
-    }
-  },
-
-  listAppointments: async () => {
-    const token = Cookies.get("token");
-    try {
-      const response = await fetch(BACKEND_URL + "/appointments", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error fetching appointments:", (error as Error).message);
-      return [];
-    }
-  },
-
-  getMessages: async (sender_id: number, receiver_id: number) => {
-    const token = Cookies.get("token");
-    try {
-      const response = await fetch(BACKEND_URL + "/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          receiver_id: receiver_id,
-        }),
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error fetching messages:", (error as Error).message);
-      return [];
+      throw error;
     }
   },
 };
