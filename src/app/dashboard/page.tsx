@@ -33,12 +33,16 @@ export default function AdminPanel() {
   const fetchAllUsers = async () => {
     try {
       const response = await backendService.getAllUsers();
-      return response;
+      if (response.length > 0 && Array.isArray(response[0])) {
+        return response[0]; // Aplanar el array anidado
+      }
+      return [];
     } catch (error) {
       console.error("Error fetching users:", (error as Error).message);
       return [];
     }
   };
+  
   const fetchLogOut = async () => {
     try {
       const response = await authenticationService.logOut();
