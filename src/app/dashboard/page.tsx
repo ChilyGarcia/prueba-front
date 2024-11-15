@@ -65,6 +65,15 @@ export default function AdminPanel() {
     }
   };
 
+  const fetchDeleteUser = async (id: number) => {
+    try {
+      const response = await backendService.deleteUser(id);
+      return response;
+    } catch (error) {
+      console.error("Error deleting user:", (error as Error).message);
+    }
+  };
+
   useEffect(() => {
     const getUserDetails = async () => {
       const userDetails = await fetchUserDetails();
@@ -136,6 +145,7 @@ export default function AdminPanel() {
   };
 
   const deleteUser = (id: number) => {
+    const deleteUser = fetchDeleteUser(id);
     setUsers(users.filter((u) => u.id !== id));
   };
 
