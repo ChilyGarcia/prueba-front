@@ -47,6 +47,15 @@ export default function AdminPanel() {
     }
   };
 
+  const fetchPostUser = async (body: IUser) => {
+    try {
+      const response = await backendService.postUser(body);
+      return response;
+    } catch (error) {
+      console.error("Error creating user:", (error as Error).message);
+    }
+  };
+
   useEffect(() => {
     const getUserDetails = async () => {
       const userDetails = await fetchUserDetails();
@@ -71,6 +80,8 @@ export default function AdminPanel() {
 
   const openModal = (mode: "create" | "edit", user?: IUser) => {
     setMode(mode);
+
+    console.log("Modo:", mode);
     setCurrentUser(
       user || {
         id: 0,
@@ -89,11 +100,19 @@ export default function AdminPanel() {
     setCurrentUser(null);
   };
 
-  const saveUser = (e: React.FormEvent) => {
+  const saveUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (currentUser) {
       if (mode === "create") {
-        setUsers([...users, { ...currentUser, id: users.length + 1 }]);
+        console.log("Creando nuevo usuario", currentUser);
+
+        const newUser = await fetchPostUser(currentUser);
+
+        if (newUser) {
+          setUsers([...users, { ...newUser.user, id: users.length + 1 }]);
+        }
+
+        // setUsers([...users, { ...currentUser, id: users.length + 1 }]);
       } else {
         setUsers(users.map((u) => (u.id === currentUser.id ? currentUser : u)));
       }
@@ -271,13 +290,15 @@ export default function AdminPanel() {
             <div className="relative bg-white w-full max-w-md mx-auto rounded-lg shadow-lg">
               <div className="p-6">
                 <h3 className="text-lg font-medium text-gray-900 mb-4">
-                  {mode === "create" ? "Add User" : "Edit User"}
+                  {mode === "create"
+                    ? "Agregar nuevo usuario"
+                    : "Editar usuario"}
                 </h3>
                 <form onSubmit={saveUser} className="space-y-4">
                   <input
                     className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                     type="text"
-                    placeholder="First Name"
+                    placeholder="Nombres"
                     value={currentUser?.first_name || ""}
                     onChange={(e) =>
                       setCurrentUser({
@@ -289,7 +310,7 @@ export default function AdminPanel() {
                   <input
                     className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                     type="text"
-                    placeholder="Last Name"
+                    placeholder="Apellidos"
                     value={currentUser?.last_name || ""}
                     onChange={(e) =>
                       setCurrentUser({
@@ -301,7 +322,7 @@ export default function AdminPanel() {
                   <input
                     className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                     type="tel"
-                    placeholder="phone_number"
+                    placeholder="Número de teléfono"
                     value={currentUser?.phone_number || ""}
                     onChange={(e) =>
                       setCurrentUser({
@@ -313,7 +334,7 @@ export default function AdminPanel() {
                   <input
                     className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                     type="email"
-                    placeholder="Email"
+                    placeholder="Correo electrónico"
                     value={currentUser?.email || ""}
                     onChange={(e) =>
                       setCurrentUser({ ...currentUser!, email: e.target.value })
@@ -322,7 +343,7 @@ export default function AdminPanel() {
                   <input
                     className="w-full px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                     type="password"
-                    placeholder="Password"
+                    placeholder="Contraseña"
                     value={currentUser?.password || ""}
                     onChange={(e) =>
                       setCurrentUser({
@@ -335,7 +356,7 @@ export default function AdminPanel() {
                     type="submit"
                     className="w-full px-4 py-2 bg-teal-600 text-white font-medium rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition duration-150 ease-in-out"
                   >
-                    {mode === "create" ? "Add" : "Update"}
+                    {mode === "create" ? "Agregar" : "Actualizar"}
                   </button>
                 </form>
               </div>
