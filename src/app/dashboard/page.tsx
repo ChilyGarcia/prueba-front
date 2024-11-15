@@ -138,18 +138,27 @@ export default function AdminPanel() {
       if (mode === "create") {
         console.log("Creando nuevo usuario", currentUser);
 
-        const newUser = await fetchPostUser(currentUser);
+        const newUserResponse = await fetchPostUser(currentUser);
+        console.log("Respuesta del servidor:", newUserResponse);
+        const newUser = newUserResponse;
+        console.log("Nuevo usuario:", newUser);
 
         if (newUser) {
-          setUsers([...users, { ...newUser.user, id: users.length + 1 }]);
+          setUsers([...users, newUser]);
+          console.log("Estado de usuarios actualizado:", [...users, newUser]);
         }
       } else {
-        console.log("Editando nuevo usuario", currentUser);
+        console.log("Editando usuario", currentUser);
 
         const editUser = await fetchUpdateUser(currentUser);
+        console.log("Usuario editado:", editUser);
 
         if (editUser) {
           setUsers(
+            users.map((u) => (u.id === currentUser.id ? currentUser : u))
+          );
+          console.log(
+            "Estado de usuarios actualizado:",
             users.map((u) => (u.id === currentUser.id ? currentUser : u))
           );
         }
@@ -157,6 +166,7 @@ export default function AdminPanel() {
     }
     closeModal();
   };
+
   const deleteUser = async (id: number) => {
     try {
       const response = await fetchDeleteUser(id);
@@ -445,7 +455,36 @@ export default function AdminPanel() {
 
                     <button
                       type="submit"
-                      className="w-full px-4 py-2 bg-teal-600 text-white font-medium rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition duration-150 ease-in-out"
+                      className={`w-full px-4 py-2 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition duration-150 ease-in-out ${
+                        (mode === "create" &&
+                          (!currentUser ||
+                            !currentUser.first_name ||
+                            !currentUser.last_name ||
+                            !currentUser.phone_number ||
+                            !currentUser.email ||
+                            !currentUser.password)) ||
+                        (mode === "edit" &&
+                          (!currentUser ||
+                            !currentUser.first_name ||
+                            !currentUser.last_name ||
+                            !currentUser.phone_number))
+                          ? "bg-[#04785784] text-white cursor-not-allowed"
+                          : "bg-[#047857] text-white hover:bg-[#065f46] focus:ring-[#047857]"
+                      }`}
+                      disabled={
+                        (mode === "create" &&
+                          (!currentUser ||
+                            !currentUser.first_name ||
+                            !currentUser.last_name ||
+                            !currentUser.phone_number ||
+                            !currentUser.email ||
+                            !currentUser.password)) ||
+                        (mode === "edit" &&
+                          (!currentUser ||
+                            !currentUser.first_name ||
+                            !currentUser.last_name ||
+                            !currentUser.phone_number))
+                      }
                     >
                       {mode === "create" ? "Agregar" : "Actualizar"}
                     </button>
